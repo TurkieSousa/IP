@@ -46,13 +46,16 @@ int verificar_sequencia(int *sequencia, int tamanho, int k) {
     if (produto < k || soma > k) {
         return 0; // Sequência inválida
     }
-    return 1; // Sequência válida
+    return 1; 
 }
 
 // Função para verificar se a sequência é de vitória
 int verificar_sequencia_vitoria(int *sequencia, int tamanho, int k) {
     int diferencas_absolutas = calcular_diferencas_absolutas(sequencia, tamanho);
-    return (diferencas_absolutas == k);
+    if (diferencas_absolutas == k)
+        return 1;
+    else   
+        return 0;
 }
 
 // Função para alternar o jogador
@@ -69,23 +72,59 @@ void alternar_jogador(char *jogador_atual, int *conta_jogadas) {
 
 // Função para verificar se o jogador pode repetir a jogada
 int pode_repetir_jogada(int conta_jogadas) {
-    return conta_jogadas == 1;  // O jogador pode repetir a jogada se já fez 1 jogada previamente
+    if (conta_jogadas == 1)
+        return 1;
+    else   
+        return 0;
+}
+
+// Função para selecionar o índice com maior valor na sequência
+int selecionar_indice_maior_valor(int *sequencia, int tamanho) {
+    int max_val = sequencia[0], indice = 0;
+    for (int i = 1; i < tamanho; i++) {
+        if (sequencia[i] > max_val) {
+            max_val = sequencia[i];
+            indice = i;
+        }
+    }
+    return indice;
+}
+
+// Função para realizar a jogada artificial
+void jogada_artificial(int *sequencia, int *tamanho, int k, int *indice, int *valor) {
+    int i = selecionar_indice_maior_valor(sequencia, *tamanho);
+    int v = sequencia[i];
+
+    // Tentar reduzir, incrementar ou adicionar
+    if (v > 1) {
+        *indice = i;
+        *valor = v - 1; // Reduz
+    } else if (calcular_soma(sequencia, *tamanho) + 1 <= k) {
+        *indice = *tamanho;
+        *valor = 1; // Adiciona novo número
+        sequencia[*tamanho] = 1;
+        (*tamanho)++;
+    } else {
+        *indice = i;
+        *valor = 0; // Remove
+        for (int j = i; j < *tamanho - 1; j++) {
+            sequencia[j] = sequencia[j + 1];
+        }
+        (*tamanho)--;
+    }
 }
 
 int main() {
-    int k, sequencia[MAX_SEQ], tamanho = 0, num, jogadas = 0, conta_jogadas = 0;
+    int k, sequencia[MAX_SEQ], tamanho = 0, jogadas = 0, conta_jogadas = 0;
     char jogador_atual = 'A';
 
-    // Entrada dos valores de K e sequência
+    // Entrada do valor de K
     printf("Indique K: ");
     scanf("%d", &k);
 
-    num = k / 2;
-
-    do {
-        sequencia[tamanho] = num;
-        tamanho++;
-    } while (tamanho < 2);
+    // Configuração inicial da sequência
+    sequencia[tamanho++] = k / 2;
+    sequencia[tamanho++] = k / 2;
 
     while (jogadas < k) {
         int indice, valor;
@@ -97,15 +136,17 @@ int main() {
 
         printf("Jogada (indice valor): ");
         scanf("%d %d", &indice, &valor);
-		
-		if (indice < 0 )
-			indice = 0;
+
+        // Jogada artificial
+        if (indice == -2 && valor == -2) {
+            jogada_artificial(sequencia, &tamanho, k, &indice, &valor);
+            printf("Jogada artificial: %d %d\n", indice, valor);
+        }
 
         // Efetuar a jogada
         if (indice >= tamanho) {
             if (valor != 0) {
-                sequencia[tamanho] = valor;
-                tamanho++;
+                sequencia[tamanho++] = valor;
             }
         } else if (indice <= tamanho && valor == 0) {
             for (int i = indice; i < tamanho - 1; i++) {
@@ -122,7 +163,7 @@ int main() {
             sequencia[indice] = valor;
         }
 
-        // Verificar a validade da sequência
+        // Verificar validade da sequência
         if (!verificar_sequencia(sequencia, tamanho, k)) {
             printf("\nSequencia: ");
             for (int i = 0; i < tamanho; i++) {
@@ -132,7 +173,7 @@ int main() {
             return 0;
         }
 
-        // Verificar se é uma sequência de vitória
+        // Verificar vitória
         if (verificar_sequencia_vitoria(sequencia, tamanho, k)) {
             printf("\nSequencia: ");
             for (int i = 0; i < tamanho; i++) {
@@ -142,21 +183,11 @@ int main() {
             return 0;
         }
 
-        // Se a jogada foi válida e não repetida, alterna o jogador
-        if (valor > 0) {
-            alternar_jogador(&jogador_atual, &conta_jogadas);
-        } else {
-            // Se a jogada for repetição, aumenta o contador de jogadas repetidas
-            conta_jogadas++;
-            if (conta_jogadas > 1) { // Não permite mais repetir após 1 vez
-                alternar_jogador(&jogador_atual, &conta_jogadas);
-            }
-        }
-
+        // Alternar jogador
+        alternar_jogador(&jogador_atual, &conta_jogadas);
         jogadas++;
     }
 
-    // Jogo empatado após K jogadas
     printf("\nSequencia: ");
     for (int i = 0; i < tamanho; i++) {
         printf("%d ", sequencia[i]);

@@ -42,7 +42,7 @@ int calcular_diferencas_absolutas(int *sequencia, int tamanho) {
 int main() {
     int k, sequencia[MAX_SEQ], tamanho = 0, num;
 
-    // Entrada do valor de K
+    // Entrada do valor  K
     printf("Indique K: ");
     scanf("%d", &k);
 

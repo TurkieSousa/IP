@@ -43,16 +43,17 @@ int verificar_sequencia(int *sequencia, int tamanho, int k) {
     int produto = calcular_produto(sequencia, tamanho);
     int soma = calcular_soma(sequencia, tamanho);
 
-    if (produto < k || soma > k) {
+    if (produto < k || soma > k) 
         return 0; // Sequência inválida
-    }
     return 1; // Sequência válida
 }
 
 // Função para verificar se a sequência é de vitória
 int verificar_sequencia_vitoria(int *sequencia, int tamanho, int k) {
     int diferencas_absolutas = calcular_diferencas_absolutas(sequencia, tamanho);
-    return (diferencas_absolutas == k);
+    if (diferencas_absolutas == k)
+        return 1;
+    return 0;
 }
 
 // Função para alternar o jogador
@@ -67,23 +68,17 @@ void alternar_jogador(char *jogador_atual, int *conta_jogadas) {
     *conta_jogadas = 0;
 }
 
-// Função para verificar se o jogador pode repetir a jogada
-int pode_repetir_jogada(int conta_jogadas) {
-    return conta_jogadas == 1;  // O jogador pode repetir a jogada se já fez 1 jogada previamente
-}
 
 int main() {
-    int k, sequencia[MAX_SEQ], tamanho = 0, num, jogadas = 0, conta_jogadas = 0;
+    int k, sequencia[MAX_SEQ], tamanho = 0, jogadas = 0, conta_jogadas = 0;
     char jogador_atual = 'A';
 
     // Entrada dos valores de K e sequência
     printf("Indique K: ");
     scanf("%d", &k);
 
-    num = k / 2;
-
     do {
-        sequencia[tamanho] = num;
+        sequencia[tamanho] = k / 2;
         tamanho++;
     } while (tamanho < 2);
 
